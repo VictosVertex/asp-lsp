@@ -1,0 +1,6 @@
+# Rust output
+/target
+
+# VSCode extension
+editors/vscode/out/
+editors/vscode/node_modules/

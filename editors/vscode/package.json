@@ -1,0 +1,39 @@
+{
+    "name": "asp-lsp",
+    "description": "ASP Language Server",
+    "license": "MIT",
+    "publisher": "Victos",
+    "version": "0.0.1",
+    "engines": {
+      "vscode": "^1.86.0"
+    },
+    "dependencies": {
+      "vscode-languageclient": "^8.1.0"
+    },
+    "devDependencies": {
+      "@types/node": "^20.11.17",
+      "@types/vscode": "^1.86.0",
+      "typescript": "^5.3.3"
+    },
+    "activationEvents": [
+      "onLanguage:asp"
+    ],
+    "main": "./out/extension.js",
+    "contributes": {
+        "languages": [
+            {
+                "id": "asp",
+                "extensions": [
+                    ".lp"
+                ],
+                "aliases": [
+                    "ASP"
+                ]
+            }
+        ]
+    },
+    "scripts": {
+      "build": "tsc -b",
+      "watch": "tsc -b -w"
+    }
+  }
