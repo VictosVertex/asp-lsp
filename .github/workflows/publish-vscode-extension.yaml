@@ -72,7 +72,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: macos-executable
-          path: artifacts/server/macos
+          path: artifacts/server
 
   build-extension:
     runs-on: ubuntu-latest
