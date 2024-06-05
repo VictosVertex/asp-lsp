@@ -24,10 +24,16 @@ pub fn handle(document:&DocumentData, params:&HoverParams) -> Option<Hover> {
         .join("\n");
 
 
-        format!("```\n{}\n```\n\n{}\n\n### Parameters\n\n{}", 
+        if parameters.len() > 0 {
+            format!("```\n{}\n```\n\n{}\n\n### Parameters\n\n{}", 
             documentation.signature,
             documentation.description, 
             parameters)
+        } else {
+            format!("```\n{}\n```\n\n{}", 
+            documentation.signature,
+            documentation.description) 
+        }
     };
 
     Some(Hover {
