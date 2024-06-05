@@ -38,11 +38,12 @@ jobs:
           mkdir -p artifacts/server/linux
           mv target/x86_64-pc-windows-gnu/debug/asp-lsp.exe artifacts/server/windows/asp-lsp.exe
           mv target/x86_64-unknown-linux-gnu/debug/asp-lsp artifacts/server/linux/asp-lsp
-        - name: Upload artifacts
-          uses: actions/upload-artifact@v3
-          with:
-            name: linux-windows-executables
-            path: artifacts/server
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-windows-executables
+          path: artifacts/server
 
   build-macos:
     runs-on: macos-latest
@@ -72,11 +73,12 @@ jobs:
         run: |
           mkdir -p artifacts/server/macos
           mv target/x86_64-apple-darwin/debug/asp-lsp artifacts/server/macos/asp-lsp
-        - name: Upload artifact
-          uses: actions/upload-artifact@v3
-          with:
-            name: macos-executable
-            path: artifacts/server/macos
+          
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: macos-executable
+          path: artifacts/server/macos
 
   build-extension:
     runs-on: ubuntu-latest
