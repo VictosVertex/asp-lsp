@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-linux-windows:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,13 +32,71 @@ jobs:
           cargo build --target x86_64-pc-windows-gnu
           cargo build --target x86_64-unknown-linux-gnu
 
-      - name: Move executables
+      - name: Archive executables
         run: |
-          sudo mkdir -p editors/vscode/server
-          sudo mkdir -p editors/vscode/server/windows
-          sudo mkdir -p editors/vscode/server/linux
-          sudo mv target/x86_64-pc-windows-gnu/debug/asp-lsp.exe editors/vscode/server/windows/asp-lsp.exe
-          sudo mv target/x86_64-unknown-linux-gnu/debug/asp-lsp editors/vscode/server/linux/asp-lsp
+          mkdir -p artifacts/server/windows
+          mkdir -p artifacts/server/linux
+          mv target/x86_64-pc-windows-gnu/debug/asp-lsp.exe artifacts/server/windows/asp-lsp.exe
+          mv target/x86_64-unknown-linux-gnu/debug/asp-lsp artifacts/server/linux/asp-lsp
+        - name: Upload artifacts
+          uses: actions/upload-artifact@v3
+          with:
+            name: linux-windows-executables
+            path: artifacts/server
+
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Rust and Cargo
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+
+      - name: Install macOS target
+        run: rustup target add x86_64-apple-darwin
+
+      - name: Compile macOS executable
+        run: cargo build --target x86_64-apple-darwin
+
+      - name: Archive macOS executable
+        run: |
+          mkdir -p artifacts/server/macos
+          mv target/x86_64-apple-darwin/debug/asp-lsp artifacts/server/macos/asp-lsp
+        - name: Upload artifact
+          uses: actions/upload-artifact@v3
+          with:
+            name: macos-executable
+            path: artifacts/server/macos
+
+  build-extension:
+    runs-on: ubuntu-latest
+    needs: [build-linux-windows, build-macos]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Download Linux and Windows artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: linux-windows-executables
+          path: editors/vscode/server
+
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: macos-executable
+          path: editors/vscode/server
 
       - name: Install npm packages
         working-directory: editors/vscode
