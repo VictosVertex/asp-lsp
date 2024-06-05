@@ -92,7 +92,7 @@ impl Documentation {
                 if identifier.is_none() || arguments.is_none() {
                     return;
                 }
-
+                
                 if Documentation::has_error(&atom_node) {
                     return;
                 }
@@ -107,9 +107,11 @@ impl Documentation {
 
                 let argument_descriptions = Documentation::get_argument_descriptions(&descriptions);
 
-                info!("{}", arguments.clone().unwrap().join(","));
-
-                let sig = format!("{}({}).", identifier.clone().unwrap(), arguments.clone().unwrap().join(","));
+                let sig = if arguments.clone().unwrap().len() > 0 {
+                    format!("{}({}).", identifier.clone().unwrap(), arguments.clone().unwrap().join(","))
+                } else {
+                    format!("{}.", identifier.clone().unwrap())
+                };
 
                 Documentation::insert_predicate_documentation(&document.documentation,
                     &identifier.unwrap(),
@@ -191,9 +193,17 @@ impl Documentation {
             return None;
         }
 
+        let mut arguments = Vec::new();
+
+        if node.child_count() == 1 || node.child_count() == 3 {
+            // Either only identifier or identifier with two parentheses
+            // it therefore has 0 arguments.
+            return Some(arguments);
+        }
+
         let argvec = node.child(2)?;
         let mut termvec = argvec.child(0)?;
-        let mut arguments = Vec::new();
+        
 
         while termvec.kind() == "termvec" {
             let child_index = if termvec.child_count() == 1 {0} else {2};
