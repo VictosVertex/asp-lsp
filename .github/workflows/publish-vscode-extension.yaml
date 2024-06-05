@@ -9,18 +9,15 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Install Rust and Cargo
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Install cross-compilation targets
         run: |
@@ -40,7 +37,7 @@ jobs:
           mv target/x86_64-unknown-linux-gnu/debug/asp-lsp artifacts/server/linux/asp-lsp
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux-windows-executables
           path: artifacts/server
@@ -50,18 +47,15 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Install Rust and Cargo
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Install macOS target
         run: rustup target add x86_64-apple-darwin
@@ -73,9 +67,9 @@ jobs:
         run: |
           mkdir -p artifacts/server/macos
           mv target/x86_64-apple-darwin/debug/asp-lsp artifacts/server/macos/asp-lsp
-          
+
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: macos-executable
           path: artifacts/server/macos
@@ -86,16 +80,16 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Download Linux and Windows artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: linux-windows-executables
           path: editors/vscode/server
 
       - name: Download macOS artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: macos-executable
           path: editors/vscode/server
