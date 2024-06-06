@@ -102,6 +102,11 @@ jobs:
         working-directory: editors/vscode
         run: npm run build
 
+      - name: Set executable permissions
+        run: |
+          chmod +x editors/vscode/server/linux/asp-lsp
+          chmod +x editors/vscode/server/macos/asp-lsp
+
       - name: Install vsce for publishing
         working-directory: editors/vscode
         run: npm install -g vsce
