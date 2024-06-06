@@ -3,7 +3,7 @@
     "description": "ASP Language Server",
     "license": "MIT",
     "publisher": "Victos",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "engines": {
       "vscode": "^1.86.0"
     },
