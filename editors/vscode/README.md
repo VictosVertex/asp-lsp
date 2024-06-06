@@ -74,7 +74,7 @@ When defining rules, the language server will continuously check whether the var
 ![safety](https://github.com/VictosVertex/asp-lsp-assets/blob/main/vscode_extension/unsafe.png?raw=true)
 
 ### Goto
-Since ASP allows for multiple declarations of the same predicate, **goto definition** shows all occurences of the predicate in the **head**. Similarly, **goto reference** shows all occurences of the predicate in the **body**.
+Since ASP allows for multiple declarations of the same predicate, **goto definition** shows all occurrences of the predicate in the **head**. Similarly, **goto reference** shows all occurrences of the predicate in the **body**.
 
 ## Issues, Requests Or Questions
 If you have any issues, requests, questions or suggestions, feel free to contact me directly or open an [issue](https://github.com/VictosVertex/asp-lsp/issues) on github.
