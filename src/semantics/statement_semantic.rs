@@ -471,8 +471,8 @@ impl StatementSemantics {
                     let operator = node.child(1).unwrap();
                     let right_child = node.child(2).unwrap();
                     match operator.kind() {
-                        "LPAREN" => {
-                            // We have an term of form f(t) pass on the provide value of the child
+                        "LPAREN" | "tuplevec" => {
+                            // We have a term of form f(t) or a tuple (t), pass on the provide value of the child
                             Self::pass_on_provide_from_children(node, document);
                         }
                         "ADD" | "SUB" => {
@@ -531,7 +531,7 @@ impl StatementSemantics {
                     }
                 }
             }
-            "termvec" => {
+            "termvec" | "tuple" | "tuplevec" => {
                 Self::pass_on_provide_from_children(node, document);
             }
             "argvec" => {
@@ -570,7 +570,7 @@ impl StatementSemantics {
      */
     fn check_depend(node: Node, document: &mut DocumentData) {
         match node.kind() {
-            "termvec" => {
+            "termvec" | "tuple" | "tuplevec"=> {
                 Self::pass_on_depend_from_children(node, document, true);
             }
             "argvec" => {
@@ -621,8 +621,8 @@ impl StatementSemantics {
                     let operator = node.child(1).unwrap();
                     let _right_child = node.child(2).unwrap();
                     match operator.kind() {
-                        "LPAREN" => {
-                            // We have an term of form f(t) pass on the depend value of the child
+                        "LPAREN" | "tuplevec" => {
+                            // We have a term of form f(t) or a tuple (t), pass on the depend value of the child
                             Self::pass_on_depend_from_children(node, document, false);
                         }
                         _ => {
