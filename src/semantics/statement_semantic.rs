@@ -1170,8 +1170,8 @@ impl StatementSemantics {
                     //Find the correct node that represents the condition
                     let condition: Node = if seperator.kind() == "COLON" {
                         node.child(offset + 2).unwrap()
-                    } else if seperator.kind() == "optcondition" && seperator.child_count() >= 2 {
-                        seperator.child(2).unwrap()
+                    } else if seperator.kind() == "optcondition" && seperator.child_count() == 2 {
+                        seperator.child(1).unwrap()
                     } else {
                         // Should never trigger
                         node.child(0).unwrap()
