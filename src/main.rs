@@ -90,7 +90,7 @@ impl LanguageServer for Backend {
         self.client
             .log_message(MessageType::INFO, "initialized!")
             .await;
-
+        
     }
 
     async fn shutdown(&self) -> Result<()> {
@@ -124,7 +124,7 @@ impl LanguageServer for Backend {
         // Parse the document and save the parse tree in a hashmap
         let mut parser = Parser::new();
         parser
-            .set_language(tree_sitter_clingo::language())
+            .set_language(&tree_sitter_clingo::language())
             .expect("Error loading clingo grammar");
 
         let tree = parser
@@ -179,7 +179,7 @@ impl LanguageServer for Backend {
 
         let mut parser = Parser::new();
         parser
-            .set_language(tree_sitter_clingo::language())
+            .set_language(&tree_sitter_clingo::language())
             .expect("Error loading clingo grammar");
 
         document.update_document(params.content_changes, &mut parser);

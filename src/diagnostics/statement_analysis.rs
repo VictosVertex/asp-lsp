@@ -137,7 +137,7 @@ fn get_variables_in_statement<'a>(
     source: &'a [u8],
 ) -> std::vec::Vec<(tree_sitter::Range, &'a str, tree_sitter::Node<'a>)> {
     let mut query_cursor = QueryCursor::new();
-    let query = Query::new(tree_sitter_clingo::language(), "(VARIABLE) @name").unwrap();
+    let query = Query::new(&tree_sitter_clingo::language(), "(VARIABLE) @name").unwrap();
 
     let matches = query_cursor.matches(&query, *node, source);
     let mut output = Vec::new();

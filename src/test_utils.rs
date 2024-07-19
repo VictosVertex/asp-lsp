@@ -9,7 +9,7 @@ use tree_sitter::Parser;
 pub fn create_test_document(source: String) -> DocumentData {
     let mut parser = Parser::new();
     parser
-        .set_language(tree_sitter_clingo::language())
+        .set_language(&tree_sitter_clingo::language())
         .expect("Error loading clingo grammar");
 
     let tree = parser.parse(source.clone(), None).unwrap();
