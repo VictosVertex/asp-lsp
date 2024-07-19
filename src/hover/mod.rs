@@ -15,8 +15,15 @@ pub fn handle(document:&DocumentData, params:&HoverParams) -> Option<Hover> {
 
     let doc_string = if let Some(arg_position) = argument_position {
         let index = arity - 1 - arg_position;
-        let argument = &documentation.arguments[index];
-        format!("`{}` - {}",argument.identifier, argument.description)
+
+        if &index < &documentation.arguments.len() {
+            let argument = &documentation.arguments[index];
+            format!("`{}` - {}",argument.identifier, argument.description)   
+        } else {
+            format!("")
+        }
+
+        
     } else {
         let parameters: String = documentation.arguments.iter()
         .map(|arg| format!(" - `{}` - {}", arg.identifier, arg.description))
