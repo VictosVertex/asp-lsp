@@ -40,7 +40,7 @@ The language server currently supports keyword completions for directives such a
 ### **Hover**
 In order to use the `hover` feature for predicates one first has to write `doc strings` that provide the wanted information.
 #### Doc Strings
-To define a `doc string` for a predicate, first a multi-line comment using `%*` and `*%` has to be created. The first content of the comment has to be a `#` followed by the predicate's full signature (including the dot!). It is advised to follow the signature with a general description of the predicate. Lastly `#parameters` on a single line opens up the parameter descriptions. Each parameters is described by their name followed by `:` and a description.
+To define a `doc string` for a predicate, first a multi-line comment using `%*` and `*%` has to be created. The first content of the comment has to be a `#` followed by the predicate's full signature (including the dot!). It is advised to follow the signature with a general description of the predicate. Lastly `#parameters` (or a valid markdown header for `Parameters`) on a single line opens up the parameter descriptions. Each parameter is described by their name followed by `:` and a description.
 
 - A full example may look as follows:
     ```
@@ -50,9 +50,9 @@ To define a `doc string` for a predicate, first a multi-line comment using `%*` 
     This is an example predicate used for the illustration of doc strings.
 
     #parameters
-        A : The first argument/parameter of the predicate.
-        B : Another parameter of this example predicate.
-        C : The last parameter in this example.
+        - A : The first argument/parameter of the predicate.
+        - B : Another parameter of this example predicate.
+        - C : The last parameter in this example.
     *%
     ```
 
