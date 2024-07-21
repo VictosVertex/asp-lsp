@@ -14,33 +14,20 @@ pub fn handle(document:&DocumentData, params:&HoverParams) -> Option<Hover> {
     let documentation = document.documentation.predicates.get(&(identifier.clone(), arity))?;
 
     let doc_string = if let Some(arg_position) = argument_position {
+        // On argument hover
         let index = arity - 1 - arg_position;
+        let argument = &documentation.arguments[index];
 
-        if &index < &documentation.arguments.len() {
-            let argument = &documentation.arguments[index];
-            format!("`{}` - {}",argument.identifier, argument.description)   
+        if let Some(descr) = &documentation.argument_descriptions.get(argument) {
+            format!("`{}` - {}",argument, descr.to_string())   
         } else {
             format!("")
         }
 
         
     } else {
-        let parameters: String = documentation.arguments.iter()
-        .map(|arg| format!(" - `{}` - {}", arg.identifier, arg.description))
-        .collect::<Vec<String>>()
-        .join("\n");
-
-
-        if parameters.len() > 0 {
-            format!("```\n{}\n```\n\n{}\n\n### Parameters\n\n{}", 
-            documentation.signature,
-            documentation.description, 
-            parameters)
-        } else {
-            format!("```\n{}\n```\n\n{}", 
-            documentation.signature,
-            documentation.description) 
-        }
+        // On predicate hover
+        documentation.description.to_string()
     };
 
     Some(Hover {

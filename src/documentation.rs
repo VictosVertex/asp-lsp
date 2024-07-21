@@ -1,4 +1,4 @@
-use std::collections::VecDeque;
+use std::collections::{HashSet, VecDeque};
 
 use dashmap::DashMap;
 use log::info;
@@ -11,17 +11,12 @@ pub struct Documentation {
     pub predicates: DashMap<(String, usize), PredicateDocumentation>,
 }
 
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Debug)]
 pub struct PredicateDocumentation {
     pub signature: String,
     pub description: String,
-    pub arguments: Vec<ArgumentDocumentation>
-}
-
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
-pub struct ArgumentDocumentation {
-    pub identifier: String,
-    pub description: String,
+    pub arguments: Vec<String>,
+    pub argument_descriptions: DashMap<String, String>,
 }
 
 impl Documentation {
@@ -63,7 +58,7 @@ impl Documentation {
                 let signature = &comment[1..signature_end+1];
                 let descriptions = &comment[signature_end+1..];
 
-                //Parse signature for analysis
+                // Parse signature for analysis
                 let tree = {
                     let mut parser = Parser::new();
                     parser
@@ -97,26 +92,20 @@ impl Documentation {
                     return;
                 }
 
-                let parameters_begin = descriptions.find("#parameters");
-
-                let description = match parameters_begin {
-                    Some(index) => &descriptions[..index],
-                    None => &descriptions
-                }.trim();
-                
-
-                let argument_descriptions = Documentation::get_argument_descriptions(&descriptions);
-
                 let sig = if arguments.clone().unwrap().len() > 0 {
                     format!("{}({}).", identifier.clone().unwrap(), arguments.clone().unwrap().join(","))
                 } else {
                     format!("{}.", identifier.clone().unwrap())
                 };
 
+                let (full_description, argument_descriptions) = Documentation::get_descriptions(&descriptions, arguments.as_ref().unwrap());
+
+                
+
                 Documentation::insert_predicate_documentation(&document.documentation,
                     &identifier.unwrap(),
                     &sig,
-                    description,
+                    &full_description,
                     &arguments.unwrap(),
                     &argument_descriptions);
 
@@ -133,19 +122,12 @@ impl Documentation {
         arguments: &Vec<String>, 
         argument_descriptions: &DashMap<String, String>) {
         
-        let arg_docu: Vec<ArgumentDocumentation> = arguments.iter().filter_map(|arg| {
-            argument_descriptions.get(arg).map(|desc| {
-                ArgumentDocumentation {
-                    identifier: arg.clone(),
-                    description: desc.clone(),
-                }
-            })
-        }).collect();
 
         let predicate_documentation = PredicateDocumentation {
             signature: signature.to_string(),
             description: description.to_string(),
-            arguments: arg_docu
+            arguments: arguments.clone(),
+            argument_descriptions: argument_descriptions.clone(),
         };
 
         let arity = arguments.len();
@@ -222,20 +204,85 @@ impl Documentation {
         Some(arguments)
     }
 
-    fn get_argument_descriptions(input: &str) -> DashMap<String, String> {
-        input.lines()
-            .map(str::trim_start)
-            .skip_while(|line| !line.starts_with("#parameters"))
-            .skip(1)
-            .filter_map(|line| {
-                let parts = line.split_once(':');
+    fn line_starts_with_parameters(line: &str) -> bool {
+        let trimmed_line = line.trim_start();
+    
+        if trimmed_line.starts_with('#') {
+            let rest = trimmed_line.trim_start_matches('#').trim_start();
+            return rest.starts_with("Parameters") || rest == "parameters";
+        }
+    
+        false
+    }
 
-                if parts.is_some() {
-                    Some((parts.unwrap().0.trim().to_string(), parts.unwrap().1.trim().to_string()))
+    fn get_descriptions(input: &str, arguments: &Vec<String>) -> (String, DashMap<String, String>) {
+        let map = DashMap::new();
+        let mut full_description = String::new();
+        let mut current_key = String::new();
+        let mut current_value = String::new();
+        let mut is_in_parameters = false;
+
+        let parameter_set: HashSet<_> = arguments.iter().cloned().collect();
+
+        // Internal function to remove duplication
+        fn save_parameter(map: &DashMap<String, String>, full_description: &mut String, key: &mut String, value: &mut String) {
+            map.insert(key.clone(), value.trim().to_string());
+            full_description.push_str(&format!(" - `{}` - {}\n", key, value.trim()));
+            key.clear();
+            value.clear();
+        }
+    
+        for line in input.lines().map(str::trim_start) {
+            if Documentation::line_starts_with_parameters(&line) {
+                is_in_parameters = true;
+
+                if line.starts_with("#parameters") {
+                    full_description.push_str("### Parameters\n\n")
                 } else {
-                    None
+                    full_description.push_str(line);
+                    full_description.push_str("\n\n");
                 }
-            })
-            .collect()
+                continue;
+            }
+
+            if is_in_parameters {
+                if line.starts_with("- ") {
+                    // Save the previous parameter if there is one
+                    if !current_key.is_empty() {
+                        save_parameter(&map, &mut full_description, &mut current_key, &mut current_value);
+                    }
+
+                    // Look for parameter description
+                    if let Some((key, value)) = line[2..].split_once(':') {
+                        if parameter_set.contains(key.trim()) {
+                            // A valid argument description was found.
+                            current_key = key.trim().to_string();
+                            current_value = value.trim().to_string();
+                        }
+                    }
+                } else if line.is_empty() {
+                    // Save the previous parameter if there is one
+                    if !current_key.is_empty() {
+                        save_parameter(&map, &mut full_description, &mut current_key, &mut current_value);
+                        full_description.push('\n');
+                        is_in_parameters = false;
+                    }
+
+                } else {
+                    current_value.push(' ');
+                    current_value.push_str(line);
+                }
+            } else {
+                full_description.push_str(line);
+                full_description.push('\n');  
+            }
+        }
+    
+        // Insert the last parameter if there is one
+        if !current_key.is_empty() {
+            save_parameter(&map, &mut full_description, &mut current_key, &mut current_value);
+        }
+    
+        (full_description, map)
     }
 }
